@@ -131,296 +131,227 @@ export function AccountContent({ profile: initialProfile, userId, userEmail }: A
     router.push("/auth/login")
   }
 
-  return (
-    <div className="p-8 max-w-4xl">
-      <h1 className="text-3xl font-bold text-foreground mb-6">Konto</h1>
+ return (
+  <div className="p-8 max-w-4xl">
+    <h1 className="text-3xl font-bold text-foreground mb-6">Konto</h1>
 
-      <Tabs defaultValue="profile">
-        <TabsList className="mb-6 grid w-full grid-cols-4 rounded-full">
-          <TabsTrigger value="profile" className="flex items-center gap-2 rounded-full">
-            <User className="h-4 w-4" />
-            <span className="hidden sm:inline">Konto</span>
-          </TabsTrigger>
-          <TabsTrigger value="parental" className="flex items-center gap-2 rounded-full">
-            <Shield className="h-4 w-4" />
-            <span className="hidden sm:inline">Parental</span>
-          </TabsTrigger>
-          <TabsTrigger value="artist" className="flex items-center gap-2 rounded-full">
-            <Mic2 className="h-4 w-4" />
-            <span className="hidden sm:inline">Artist</span>
-          </TabsTrigger>
-          <TabsTrigger value="info" className="flex items-center gap-2 rounded-full">
-            <Info className="h-4 w-4" />
-            <span className="hidden sm:inline">Info</span>
-          </TabsTrigger>
-        </TabsList>
+    <Tabs defaultValue="profile">
+      <TabsList className="mb-6 grid w-full grid-cols-4 rounded-full">
+        <TabsTrigger value="profile" className="flex items-center gap-2 rounded-full">
+          <User className="h-4 w-4" />
+          <span className="hidden sm:inline">Konto</span>
+        </TabsTrigger>
+        <TabsTrigger value="parental" className="flex items-center gap-2 rounded-full">
+          <Shield className="h-4 w-4" />
+          <span className="hidden sm:inline">Parental</span>
+        </TabsTrigger>
+        <TabsTrigger value="artist" className="flex items-center gap-2 rounded-full">
+          <Mic2 className="h-4 w-4" />
+          <span className="hidden sm:inline">Artist</span>
+        </TabsTrigger>
+        <TabsTrigger value="info" className="flex items-center gap-2 rounded-full">
+          <Info className="h-4 w-4" />
+          <span className="hidden sm:inline">Info</span>
+        </TabsTrigger>
+      </TabsList>
 
-        {/* Profile Tab */}
-        <TabsContent value="profile">
-          <Card className="rounded-3xl">
-            <CardHeader>
-              <CardTitle>Konto</CardTitle>
-              <CardDescription>Verwalte dein Profil</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSaveProfile} className="space-y-6">
-                <div className="flex items-center gap-6">
-                  <div className="relative">
-                    <div className="h-24 w-24 rounded-full bg-muted flex items-center justify-center overflow-hidden">
-                      {avatarPreview ? (
-                        <img src={avatarPreview} alt="Avatar" className="h-full w-full object-cover" />
-                      ) : (
-                        <User className="h-12 w-12 text-muted-foreground" />
-                      )}
-                    </div>
-                    <input
-                      ref={avatarInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleAvatarChange}
-                      className="hidden"
-                    />
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="icon"
-                      className="absolute bottom-0 right-0 rounded-full"
-                      onClick={() => avatarInputRef.current?.click()}
-                    >
-                      <Upload className="h-4 w-4" />
-                    </Button>
+      {/* ================= PROFILE ================= */}
+      <TabsContent value="profile">
+        <Card className="rounded-3xl">
+          <CardHeader>
+            <CardTitle>Konto</CardTitle>
+            <CardDescription>Verwalte dein Profil</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSaveProfile} className="space-y-6">
+              <div className="flex items-center gap-6">
+                <div className="relative">
+                  <div className="h-24 w-24 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+                    {avatarPreview ? (
+                      <img src={avatarPreview} alt="Avatar" className="h-full w-full object-cover" />
+                    ) : (
+                      <User className="h-12 w-12 text-muted-foreground" />
+                    )}
                   </div>
-                  <div className="flex-1">
-                    <Label htmlFor="displayName">Anzeigename</Label>
-                    <Input
-                      id="displayName"
-                      value={displayName}
-                      onChange={(e) => setDisplayName(e.target.value)}
-                      placeholder="Dein Anzeigename"
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label>E-Mail</Label>
-                  <Input value={userEmail} disabled className="mt-1 bg-muted" />
-                </div>
-
-                <div className="space-y-4">
-                  <Label>Design</Label>
-                  <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      variant={theme === "light" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setTheme("light")}
-                      className="rounded-full"
-                    >
-                      <Sun className="h-4 w-4 mr-2" />
-                      Hell
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={theme === "dark" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setTheme("dark")}
-                      className="rounded-full"
-                    >
-                      <Moon className="h-4 w-4 mr-2" />
-                      Dunkel
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={theme === "system" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setTheme("system")}
-                      className="rounded-full"
-                    >
-                      <Monitor className="h-4 w-4 mr-2" />
-                      System
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="flex gap-2 pt-4">
-                  <Button type="submit" disabled={isSavingProfile} className="rounded-full">
-                    <Save className="h-4 w-4 mr-2" />
-                    {isSavingProfile ? "Speichern..." : "Speichern"}
-                  </Button>
-                  <Button type="button" variant="destructive" onClick={handleLogout} className="rounded-full">
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Abmelden
+                  <input
+                    ref={avatarInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    className="hidden"
+                  />
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="icon"
+                    className="absolute bottom-0 right-0 rounded-full"
+                    onClick={() => avatarInputRef.current?.click()}
+                  >
+                    <Upload className="h-4 w-4" />
                   </Button>
                 </div>
-              </form>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
-        {/* Parental Tab */}
-        <TabsContent value="parental">
-          <Card className="rounded-3xl">
-            <CardHeader>
-              <CardTitle>Parental Controls</CardTitle>
-              <CardDescription>Kindersicherungseinstellungen</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSaveParental} className="space-y-6">
-                <div className="flex items-center justify-between p-4 rounded-2xl bg-muted">
-                  <div>
-                    <p className="font-medium">Kindersicherung aktiviert</p>
-                    <p className="text-sm text-muted-foreground">PIN erforderlich für Änderungen</p>
-                  </div>
-                  <Switch checked={parentalEnabled} onCheckedChange={setParentalEnabled} />
+                <div className="flex-1">
+                  <Label htmlFor="displayName">Anzeigename</Label>
+                  <Input
+                    id="displayName"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    placeholder="Dein Anzeigename"
+                    className="mt-1"
+                  />
                 </div>
+              </div>
 
-                {parentalEnabled && (
-                  <>
-                    <div>
-                      <Label htmlFor="parentalPin">PIN (4 Ziffern)</Label>
-                      <Input
-                        id="parentalPin"
-                        type="password"
-                        maxLength={4}
-                        value={parentalPin}
-                        onChange={(e) => setParentalPin(e.target.value.replace(/\D/g, ""))}
-                        placeholder="****"
-                        className="mt-1 max-w-32"
-                      />
-                    </div>
+              <div>
+                <Label>E-Mail</Label>
+                <Input value={userEmail} disabled className="mt-1 bg-muted" />
+              </div>
 
-                    <div className="flex items-center justify-between p-4 rounded-2xl bg-muted">
-                      <div>
-                        <p className="font-medium">Explizite Inhalte</p>
-                        <p className="text-sm text-muted-foreground">Songs mit expliziten Texten anzeigen</p>
-                      </div>
-                      <Switch checked={explicitEnabled} onCheckedChange={setExplicitEnabled} />
-                    </div>
+              <div className="space-y-4">
+                <Label>Design</Label>
+                <div className="flex gap-2">
+                  <Button type="button" variant={theme === "light" ? "default" : "outline"} size="sm" onClick={() => setTheme("light")} className="rounded-full">
+                    <Sun className="h-4 w-4 mr-2" /> Hell
+                  </Button>
+                  <Button type="button" variant={theme === "dark" ? "default" : "outline"} size="sm" onClick={() => setTheme("dark")} className="rounded-full">
+                    <Moon className="h-4 w-4 mr-2" /> Dunkel
+                  </Button>
+                  <Button type="button" variant={theme === "system" ? "default" : "outline"} size="sm" onClick={() => setTheme("system")} className="rounded-full">
+                    <Monitor className="h-4 w-4 mr-2" /> System
+                  </Button>
+                </div>
+              </div>
 
-                    <div className="flex items-center justify-between p-4 rounded-2xl bg-muted">
-                      <div>
-                        <p className="font-medium">Musikvideos</p>
-                        <p className="text-sm text-muted-foreground">Musikvideos abspielen erlauben</p>
-                      </div>
-                      <Switch checked={musicVideosEnabled} onCheckedChange={setMusicVideosEnabled} />
-                    </div>
-                  </>
-                )}
-
-                <Button type="submit" disabled={isSavingParental} className="rounded-full">
+              <div className="flex gap-2 pt-4">
+                <Button type="submit" disabled={isSavingProfile} className="rounded-full">
                   <Save className="h-4 w-4 mr-2" />
-                  {isSavingParental ? "Speichern..." : "Speichern"}
+                  {isSavingProfile ? "Speichern..." : "Speichern"}
                 </Button>
-              </form>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                <Button type="button" variant="destructive" onClick={handleLogout} className="rounded-full">
+                  <LogOut className="h-4 w-4 mr-2" /> Abmelden
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </TabsContent>
 
-        {/* Artist Tab */}
-        <TabsContent value="artist">
-          <Card className="rounded-3xl">
-            <CardHeader>
-              <CardTitle>Artist-Bereich</CardTitle>
-              <CardDescription>Werde Künstler und veröffentliche deine Musik</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSaveArtist} className="space-y-6">
-                <div className="flex items-center justify-between p-4 rounded-2xl bg-muted">
-                  <div>
-                    <p className="font-medium">Ich bin ein Künstler</p>
-                    <p className="text-sm text-muted-foreground">Aktiviere den Artist-Modus um Musik zu veröffentlichen</p>
-                  </div>
-                  <Switch checked={isArtist} onCheckedChange={setIsArtist} />
+      {/* ================= PARENTAL ================= */}
+      <TabsContent value="parental">
+        <Card className="rounded-3xl">
+          <CardHeader>
+            <CardTitle>Parental Controls</CardTitle>
+            <CardDescription>Kindersicherungseinstellungen</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSaveParental} className="space-y-6">
+              <div className="flex items-center justify-between p-4 rounded-2xl bg-muted">
+                <div>
+                  <p className="font-medium">Kindersicherung aktiviert</p>
+                  <p className="text-sm text-muted-foreground">PIN erforderlich für Änderungen</p>
                 </div>
+                <Switch checked={parentalEnabled} onCheckedChange={setParentalEnabled} />
+              </div>
+
+              {parentalEnabled && (
+                <>
+                  <div>
+                    <Label htmlFor="parentalPin">PIN (4 Ziffern)</Label>
+                    <Input
+                      id="parentalPin"
+                      type="password"
+                      maxLength={4}
+                      value={parentalPin}
+                      onChange={(e) => setParentalPin(e.target.value.replace(/\D/g, ""))}
+                      className="mt-1 max-w-32"
+                    />
+                  </div>
+                </>
+              )}
+
+              <Button type="submit" disabled={isSavingParental} className="rounded-full">
+                <Save className="h-4 w-4 mr-2" />
+                {isSavingParental ? "Speichern..." : "Speichern"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </TabsContent>
+
+      {/* ================= ARTIST ================= */}
+      <TabsContent value="artist">
+        <Card className="rounded-3xl">
+          <CardHeader>
+            <CardTitle>Artist-Bereich</CardTitle>
+            <CardDescription>Werde Künstler und veröffentliche deine Musik</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSaveArtist} className="space-y-6">
+              <div className="flex items-center justify-between p-4 rounded-2xl bg-muted">
+                <div>
+                  <p className="font-medium">Ich bin ein Künstler</p>
+                  <p className="text-sm text-muted-foreground">Aktiviere den Artist-Modus</p>
+                </div>
+                <Switch checked={isArtist} onCheckedChange={setIsArtist} />
+              </div>
+
+              {isArtist && (
+                <>
+                  <div>
+                    <Label htmlFor="artistName">Künstlername</Label>
+                    <Input id="artistName" value={artistName} onChange={(e) => setArtistName(e.target.value)} className="mt-1" />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="artistBio">Biografie</Label>
+                    <textarea
+                      id="artistBio"
+                      value={artistBio}
+                      onChange={(e) => setArtistBio(e.target.value)}
+                      className="mt-1 w-full min-h-24 rounded-xl border px-3 py-2 text-sm"
+                    />
+                  </div>
+                </>
+              )}
+
+              <div className="flex gap-2">
+                <Button type="submit" disabled={isSavingArtist} className="rounded-full">
+                  <Save className="h-4 w-4 mr-2" />
+                  {isSavingArtist ? "Speichern..." : "Speichern"}
+                </Button>
 
                 {isArtist && (
-                  <>
-                    <div>
-                      <Label htmlFor="artistName">Künstlername</Label>
-                      <Input
-                        id="artistName"
-                        value={artistName}
-                        onChange={(e) => setArtistName(e.target.value)}
-                        placeholder="Dein Künstlername"
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="artistBio">Biografie</Label>
-                      <textarea
-                        id="artistBio"
-                        value={artistBio}
-                        onChange={(e) => setArtistBio(e.target.value)}
-                        placeholder="Erzähle etwas über dich..."
-                        className="mt-1 w-full min-h-24 rounded-xl border border-input bg-background px-3 py-2 text-sm"
-                      />
-                    </div>
-                  </>
-                )}
-
-                  <Button type="submit" disabled={isSavingArtist} className="rounded-full">
-                    <Save className="h-4 w-4 mr-2" />
-                    {isSavingArtist ? "Speichern..." : "Speichern"}
+                  <Button type="button" variant="outline" className="rounded-full" onClick={() => router.push("/artist")}>
+                    <Mic2 className="h-4 w-4 mr-2" />
+                    Artist Dashboard
                   </Button>
-                  {isArtist && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="rounded-full ml-2"
-                      onClick={() => router.push("/artist")}
-                    >
-                      <Mic2 className="h-4 w-4 mr-2" />
-                      Artist Dashboard
-                    </Button>
-                  )}
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                )}
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </TabsContent>
 
-                <TabsContent value="info">
-          <Card className="rounded-3xl">
-            <CardHeader>
-              <CardTitle>Info</CardTitle>
-              <CardDescription>App-Informationen</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Tabs defaultValue="version">
-                <TabsList className="mb-4 rounded-full">
-                  <TabsTrigger value="version" className="rounded-full">
-                    Version
-                  </TabsTrigger>
-                  <TabsTrigger value="impressum" className="rounded-full">
-                    Impressum
-                  </TabsTrigger>
-                </TabsList>
+      {/* ================= INFO ================= */}
+      <TabsContent value="info">
+        <Card className="rounded-3xl">
+          <CardHeader>
+            <CardTitle>Info</CardTitle>
+            <CardDescription>App-Informationen</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="p-4 rounded-2xl bg-muted text-center">
+              <p className="text-muted-foreground">
+                Maynsta wurde erstellt von Maynsta Inc.<br />
+                Unternehmen der Mayn Cooperation.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </TabsContent>
+    </Tabs>
+  </div>
+)
 
-                <TabsContent value="version">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 rounded-full bg-muted">
-                      <span className="font-medium">App Version</span>
-                      <span className="text-muted-foreground">v1.5</span>
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="impressum">
-                  <div className="p-4 rounded-2xl bg-muted">
-                    <p className="text-muted-foreground text-center py-8">
-                      Maynsta wurde erstellt von Maynsta Inc.<br />
-                      Maynsta Inc ist ein Unternehmen der Mayn Cooperation.<br />
-                    </p>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
-  )
-}
 
