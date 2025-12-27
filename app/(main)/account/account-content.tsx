@@ -287,48 +287,64 @@ export function AccountContent({ profile: initialProfile, userId, userEmail }: A
             <CardDescription>Werde Künstler und veröffentliche deine Musik</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSaveArtist} className="space-y-6">
-              <div className="flex items-center justify-between p-4 rounded-2xl bg-muted">
-                <div>
-                  <p className="font-medium">Ich bin ein Künstler</p>
-                  <p className="text-sm text-muted-foreground">Aktiviere den Artist-Modus</p>
-                </div>
-                <Switch checked={isArtist} onCheckedChange={setIsArtist} />
-              </div>
+<form onSubmit={handleSaveArtist} className="space-y-6">
+  <div className="flex items-center justify-between p-4 rounded-2xl bg-muted">
+    <div>
+      <p className="font-medium">Ich bin ein Künstler</p>
+      <p className="text-sm text-muted-foreground">
+        Aktiviere den Artist-Modus um Musik zu veröffentlichen
+      </p>
+    </div>
+    <Switch checked={isArtist} onCheckedChange={setIsArtist} />
+  </div>
 
-              {isArtist && (
-                <>
-                  <div>
-                    <Label htmlFor="artistName">Künstlername</Label>
-                    <Input id="artistName" value={artistName} onChange={(e) => setArtistName(e.target.value)} className="mt-1" />
-                  </div>
+  {isArtist && (
+    <>
+      <div>
+        <Label htmlFor="artistName">Künstlername</Label>
+        <Input
+          id="artistName"
+          value={artistName}
+          onChange={(e) => setArtistName(e.target.value)}
+          placeholder="Dein Künstlername"
+          className="mt-1"
+        />
+      </div>
 
-                  <div>
-                    <Label htmlFor="artistBio">Biografie</Label>
-                    <textarea
-                      id="artistBio"
-                      value={artistBio}
-                      onChange={(e) => setArtistBio(e.target.value)}
-                      className="mt-1 w-full min-h-24 rounded-xl border px-3 py-2 text-sm"
-                    />
-                  </div>
-                </>
-              )}
+      <div>
+        <Label htmlFor="artistBio">Biografie</Label>
+        <textarea
+          id="artistBio"
+          value={artistBio}
+          onChange={(e) => setArtistBio(e.target.value)}
+          placeholder="Erzähle etwas über dich..."
+          className="mt-1 w-full min-h-24 rounded-xl border border-input bg-background px-3 py-2 text-sm"
+        />
+      </div>
+    </>
+  )}
 
-              <div className="flex gap-2">
-                <Button type="submit" disabled={isSavingArtist} className="rounded-full">
-                  <Save className="h-4 w-4 mr-2" />
-                  {isSavingArtist ? "Speichern..." : "Speichern"}
-                </Button>
+  {/* ACTION BUTTONS */}
+  <div className="flex gap-2 pt-4">
+    <Button type="submit" disabled={isSavingArtist} className="rounded-full">
+      <Save className="h-4 w-4 mr-2" />
+      {isSavingArtist ? "Speichern..." : "Speichern"}
+    </Button>
 
-                {isArtist && (
-                  <Button type="button" variant="outline" className="rounded-full" onClick={() => router.push("/artist")}>
-                    <Mic2 className="h-4 w-4 mr-2" />
-                    Artist Dashboard
-                  </Button>
-                )}
-              </div>
-            </form>
+    {isArtist && (
+      <Button
+        type="button"
+        variant="outline"
+        className="rounded-full"
+        onClick={() => router.push("/artist")}
+      >
+        <Mic2 className="h-4 w-4 mr-2" />
+        Artist Dashboard
+      </Button>
+    )}
+  </div>
+</form>
+
           </CardContent>
         </Card>
       </TabsContent>
