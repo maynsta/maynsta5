@@ -369,5 +369,5 @@ export function AccountContent({ profile: initialProfile, userId, userEmail }: A
     </Tabs>
   </div>
 )
-
+}
 
