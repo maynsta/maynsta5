@@ -126,16 +126,22 @@
 }
 
 @keyframes stripe-move {
-  0% { transform: translateY(-50%) skewY(-15deg); }
-  50% { transform: translateY(-45%) skewY(-15deg); }
-  100% { transform: translateY(-50%) skewY(-15deg); }
+  0% { transform: translate(-5%, -50%) skewY(-15deg); }
+  50% { transform: translate(5%, -45%) skewY(-15deg); }
+  100% { transform: translate(-5%, -50%) skewY(-15deg); }
+}
+
+@keyframes bg-pan {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .stripe-bg {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
+  width: 110%;
   height: 200%;
   z-index: -1;
   overflow: hidden;
@@ -148,7 +154,10 @@
     #ff1493 80%,
     #ff0080 100%
   );
-  background-size: 400% 400%;
-  animation: stripe-move 10s ease-in-out infinite;
-  opacity: 0.2;
+  background-size: 200% 200%;
+  animation: 
+    stripe-move 10s ease-in-out infinite,
+    bg-pan 15s linear infinite;
+  opacity: 0.4;
+  filter: blur(40px);
 }
