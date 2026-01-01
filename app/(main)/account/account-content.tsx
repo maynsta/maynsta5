@@ -14,6 +14,8 @@ import { useTheme } from "@/contexts/theme-context"
 import { User, Shield, Mic2, Info, Sun, Moon, Monitor, LogOut, Save, Upload } from "lucide-react"
 import { useRouter } from "next/navigation"
 import useSWR from "swr"
+import { debounce } from "lodash"
+import { useCallback } from "react"
 
 interface AccountContentProps {
   profile: Profile | null
@@ -42,6 +44,23 @@ export function AccountContent({ profile: initialProfile, userId, userEmail }: A
   const [isSavingProfile, setIsSavingProfile] = useState(false)
   const avatarInputRef = useRef<HTMLInputElement>(null)
 
+  const autoSaveProfile = useCallback(
+    debounce(async (name: string) => {
+      const supabase = createClient()
+      await supabase.from("profiles").update({
+        display_name: name,
+        updated_at: new Date().toISOString(),
+      }).eq("id", userId)
+      mutateProfile()
+    }, 1000),
+    [userId, mutateProfile]
+  )
+
+  const handleDisplayNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDisplayName(e.target.value)
+    autoSaveProfile(e.target.value)
+  }
+
   // Parental Controls state
   const [parentalEnabled, setParentalEnabled] = useState(profile?.parental_controls_enabled || false)
   const [parentalPin, setParentalPin] = useState(profile?.parental_pin || "")
@@ -49,11 +68,34 @@ export function AccountContent({ profile: initialProfile, userId, userEmail }: A
   const [explicitEnabled, setExplicitEnabled] = useState(profile?.explicit_content_enabled ?? true)
   const [isSavingParental, setIsSavingParental] = useState(false)
 
-  // Artist state
-  const [isArtist, setIsArtist] = useState(profile?.is_artist || false)
-  const [artistName, setArtistName] = useState(profile?.artist_name || "")
-  const [artistBio, setArtistBio] = useState(profile?.artist_bio || "")
-  const [isSavingArtist, setIsSavingArtist] = useState(false)
+  const autoSaveArtist = useCallback(
+    debounce(async (name: string, bio: string, enabled: boolean) => {
+      const supabase = createClient()
+      await supabase.from("profiles").update({
+        is_artist: enabled,
+        artist_name: name || null,
+        artist_bio: bio || null,
+        updated_at: new Date().toISOString(),
+      }).eq("id", userId)
+      mutateProfile()
+    }, 1000),
+    [userId, mutateProfile]
+  )
+
+  const handleArtistNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setArtistName(e.target.value)
+    autoSaveArtist(e.target.value, artistBio, isArtist)
+  }
+
+  const handleArtistBioChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setArtistBio(e.target.value)
+    autoSaveArtist(artistName, e.target.value, isArtist)
+  }
+
+  const handleIsArtistChange = (checked: boolean) => {
+    setIsArtist(checked)
+    autoSaveArtist(artistName, artistBio, checked)
+  }
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -196,7 +238,7 @@ export function AccountContent({ profile: initialProfile, userId, userEmail }: A
                   <Input
                     id="displayName"
                     value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
+                    onChange={handleDisplayNameChange}
                     placeholder="Dein Anzeigename"
                     className="mt-1"
                   />
@@ -224,10 +266,6 @@ export function AccountContent({ profile: initialProfile, userId, userEmail }: A
               </div>
 
               <div className="flex gap-2 pt-4">
-                <Button type="submit" disabled={isSavingProfile} className="rounded-full">
-                  <Save className="h-4 w-4 mr-2" />
-                  {isSavingProfile ? "Speichern..." : "Speichern"}
-                </Button>
                 <Button type="button" variant="destructive" onClick={handleLogout} className="rounded-full">
                   <LogOut className="h-4 w-4 mr-2" /> Abmelden
                 </Button>
@@ -295,7 +333,7 @@ export function AccountContent({ profile: initialProfile, userId, userEmail }: A
         Aktiviere den Artist-Modus um Musik zu veröffentlichen
       </p>
     </div>
-    <Switch checked={isArtist} onCheckedChange={setIsArtist} />
+    <Switch checked={isArtist} onCheckedChange={handleIsArtistChange} />
   </div>
 
   {isArtist && (
@@ -305,7 +343,7 @@ export function AccountContent({ profile: initialProfile, userId, userEmail }: A
         <Input
           id="artistName"
           value={artistName}
-          onChange={(e) => setArtistName(e.target.value)}
+          onChange={handleArtistNameChange}
           placeholder="Dein Künstlername"
           className="mt-1"
         />
@@ -316,7 +354,7 @@ export function AccountContent({ profile: initialProfile, userId, userEmail }: A
         <textarea
           id="artistBio"
           value={artistBio}
-          onChange={(e) => setArtistBio(e.target.value)}
+          onChange={handleArtistBioChange}
           placeholder="Erzähle etwas über dich..."
           className="mt-1 w-full min-h-24 rounded-xl border border-input bg-background px-3 py-2 text-sm"
         />
@@ -326,11 +364,6 @@ export function AccountContent({ profile: initialProfile, userId, userEmail }: A
 
   {/* ACTION BUTTONS */}
   <div className="flex gap-2 pt-4">
-    <Button type="submit" disabled={isSavingArtist} className="rounded-full">
-      <Save className="h-4 w-4 mr-2" />
-      {isSavingArtist ? "Speichern..." : "Speichern"}
-    </Button>
-
     {isArtist && (
       <Button
         type="button"

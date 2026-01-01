@@ -57,9 +57,11 @@ export interface LibraryItem {
   user_id: string
   song_id: string | null
   album_id: string | null
+  artist_id: string | null
   added_at: string
   song?: Song
   album?: Album
+  artist?: Profile
 }
 
 export interface RecentlyPlayed {

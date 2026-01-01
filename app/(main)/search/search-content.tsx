@@ -1,15 +1,18 @@
 "use client"
 
 import type React from "react"
-import { useState, useCallback } from "react"
+import { useState, useCallback, useMemo } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Search, Trash2, X, Sparkles, Loader2, MessageCircle } from "lucide-react"
+import { Search, Trash2, X, Sparkles, Loader2, MessageCircle, User } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { SongListItem } from "@/components/song-list-item"
 import { AlbumCard } from "@/components/album-card"
-import type { Song, Album, SearchHistory, Playlist } from "@/lib/types"
+import type { Song, Album, SearchHistory, Playlist, Profile } from "@/lib/types"
 import useSWR, { mutate } from "swr"
+import { debounce } from "lodash"
+import Link from "next/link"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface SearchContentProps {
   initialSearchHistory: SearchHistory[]
@@ -18,8 +21,21 @@ interface SearchContentProps {
 
 export function SearchContent({ initialSearchHistory, userId }: SearchContentProps) {
   const [query, setQuery] = useState("")
-  const [searchResults, setSearchResults] = useState<{ songs: Song[]; albums: Album[] } | null>(null)
+  const [searchResults, setSearchResults] = useState<{ songs: Song[]; albums: Album[]; artists: Profile[] } | null>(null)
   const [isSearching, setIsSearching] = useState(false)
+
+  const debouncedSearch = useCallback(
+    debounce((q: string) => {
+      handleSearch(q)
+    }, 500),
+    [],
+  )
+
+  const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setQuery(value)
+    debouncedSearch(value)
+  }
   
   const [aiQuestion, setAiQuestion] = useState("")
   const [aiResponse, setAiResponse] = useState("")
@@ -74,9 +90,17 @@ export function SearchContent({ initialSearchHistory, userId }: SearchContentPro
         .ilike("title", `%${searchQuery}%`)
         .limit(10)
 
+      const { data: artists } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("is_artist", true)
+        .or(`artist_name.ilike.%${searchQuery}%,display_name.ilike.%${searchQuery}%`)
+        .limit(10)
+
       setSearchResults({
         songs: songs || [],
         albums: albums || [],
+        artists: artists || [],
       })
 
       mutateHistory()
@@ -153,7 +177,7 @@ export function SearchContent({ initialSearchHistory, userId }: SearchContentPro
             <Input
               placeholder="Songs, Alben oder Künstler suchen..."
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={handleQueryChange}
               className="pl-10 pr-10 bg-card"
             />
             {query && (
@@ -263,11 +287,37 @@ export function SearchContent({ initialSearchHistory, userId }: SearchContentPro
               )}
 
               {searchResults.albums.length > 0 && (
-                <section>
+                <section className="mb-10">
                   <h2 className="text-xl font-semibold text-foreground mb-4">Alben</h2>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                     {searchResults.albums.map((album) => (
                       <AlbumCard key={album.id} album={album} />
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {searchResults.artists.length > 0 && (
+                <section>
+                  <h2 className="text-xl font-semibold text-foreground mb-4">Künstler</h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    {searchResults.artists.map((artist) => (
+                      <Link
+                        key={artist.id}
+                        href={`/artist/${artist.id}`}
+                        className="group flex flex-col items-center p-4 rounded-2xl hover:bg-accent transition-colors text-center"
+                      >
+                        <Avatar className="h-32 w-32 mb-4 border-2 border-border group-hover:border-primary transition-colors">
+                          <AvatarImage src={artist.avatar_url || ""} />
+                          <AvatarFallback className="text-2xl">
+                            {artist.artist_name?.[0] || artist.display_name?.[0] || "?"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <h3 className="font-semibold text-foreground truncate w-full">
+                          {artist.artist_name || artist.display_name}
+                        </h3>
+                        <p className="text-xs text-muted-foreground">Künstler</p>
+                      </Link>
                     ))}
                   </div>
                 </section>
