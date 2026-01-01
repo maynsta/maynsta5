@@ -393,7 +393,7 @@ export function AccountContent({ profile: initialProfile, userId, userEmail }: A
             <div className="p-4 rounded-2xl bg-muted text-center">
               <p className="text-muted-foreground">
                 Maynsta wurde erstellt von Maynsta Inc.<br />
-                Unternehmen der Mayn Cooperation.
+                Alle Rechte vorbehalten.
               </p>
             </div>
           </CardContent>
