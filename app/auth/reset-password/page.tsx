@@ -1,8 +1,7 @@
-"use client"
+'use client'
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-
+import { useRouter, useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,24 +9,28 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 export default function ResetPasswordPage() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const supabase = createClient()
+
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const router = useRouter()
-  const supabase = createClient()
-
-  useEffect(() => {
-    // Supabase Session aus URL herstellen (wichtig!)
-    supabase.auth.getSession()
-  }, [supabase])
+  // Token aus URL holen
+  const token = searchParams.get('access_token')
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
     setSuccess(null)
+
+    if (!token) {
+      setError("Ungültiger Link. Bitte fordere ein neues Passwort an.")
+      return
+    }
 
     if (password.length < 6) {
       setError("Das Passwort muss mindestens 6 Zeichen lang sein.")
@@ -41,9 +44,7 @@ export default function ResetPasswordPage() {
 
     setIsLoading(true)
 
-    const { error } = await supabase.auth.updateUser({
-      password,
-    })
+    const { error } = await supabase.auth.updateUser({ password }, token)
 
     if (error) {
       setError(error.message)
@@ -110,4 +111,3 @@ export default function ResetPasswordPage() {
     </div>
   )
 }
-
