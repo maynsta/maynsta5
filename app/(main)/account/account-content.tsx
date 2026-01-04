@@ -68,6 +68,12 @@ export function AccountContent({ profile: initialProfile, userId, userEmail }: A
   const [explicitEnabled, setExplicitEnabled] = useState(profile?.explicit_content_enabled ?? true)
   const [isSavingParental, setIsSavingParental] = useState(false)
 
+// Artist state  👈 HIER
+const [isArtist, setIsArtist] = useState(profile?.is_artist ?? false)
+const [artistName, setArtistName] = useState(profile?.artist_name || "")
+const [artistBio, setArtistBio] = useState(profile?.artist_bio || "")
+const [isSavingArtist, setIsSavingArtist] = useState(false)
+
   const autoSaveArtist = useCallback(
     debounce(async (name: string, bio: string, enabled: boolean) => {
       const supabase = createClient()
