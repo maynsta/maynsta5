@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
@@ -44,23 +44,24 @@ export default function ResetPasswordPage() {
 
     setIsLoading(true)
 
-    // Supabase Passwort mit Code zurücksetzen
-    const { error } = await supabase.auth.updateUser(
-      { password },
-      code
-    )
+    try {
+      // Passwort zurücksetzen mit dem Code von Supabase
+      const { error } = await supabase.auth.updateUser({ password }, code)
 
-    if (error) {
-      setError(error.message)
+      if (error) {
+        setError(error.message)
+        setIsLoading(false)
+        return
+      }
+
+      setSuccess("Passwort erfolgreich geändert. Du wirst weitergeleitet…")
+      setTimeout(() => {
+        router.push("/auth/login")
+      }, 2000)
+    } catch (err: any) {
+      setError(err.message || "Ein Fehler ist aufgetreten.")
       setIsLoading(false)
-      return
     }
-
-    setSuccess("Passwort erfolgreich geändert. Du wirst weitergeleitet…")
-
-    setTimeout(() => {
-      router.push("/auth/login")
-    }, 2000)
   }
 
   if (!code) {
