@@ -19,15 +19,15 @@ export default function ResetPasswordPage() {
   const [success, setSuccess] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  // Token aus URL holen
-  const token = searchParams.get('access_token')
+  // Supabase liefert den Reset-Code als ?code=XYZ in der URL
+  const code = searchParams.get("code")
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
     setSuccess(null)
 
-    if (!token) {
+    if (!code) {
       setError("Ungültiger Link. Bitte fordere ein neues Passwort an.")
       return
     }
@@ -44,7 +44,11 @@ export default function ResetPasswordPage() {
 
     setIsLoading(true)
 
-    const { error } = await supabase.auth.updateUser({ password }, token)
+    // Supabase Passwort mit Code zurücksetzen
+    const { error } = await supabase.auth.updateUser(
+      { password },
+      code
+    )
 
     if (error) {
       setError(error.message)
@@ -57,6 +61,14 @@ export default function ResetPasswordPage() {
     setTimeout(() => {
       router.push("/auth/login")
     }, 2000)
+  }
+
+  if (!code) {
+    return (
+      <div className="flex min-h-svh items-center justify-center bg-background p-6">
+        <p className="text-destructive">Ungültiger Link. Bitte fordere ein neues Passwort an.</p>
+      </div>
+    )
   }
 
   return (
